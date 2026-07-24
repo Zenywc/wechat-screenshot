@@ -7,6 +7,7 @@ import { drawAvatar } from './drawAvatar';
 import { drawBubble } from './drawBubble';
 import { drawNickname } from './drawNickname';
 import { drawMessageText } from './drawMessageText';
+import { drawTime } from './drawTime';
 import type { TextLayoutResult } from './types';
 
 /**
@@ -77,31 +78,44 @@ export async function renderToCanvas(
       const msg = messages.find((m) => m.id === geom.messageId);
       if (!msg) continue;
 
-      // Avatar
-      if (geom.avatar && msg.avatar) {
-        const avatarImg = imageMap.get(msg.avatar);
-        if (avatarImg) {
-          drawAvatar(ctx, avatarImg, geom.avatar.x, geom.avatar.y);
+      // Time and revoke — both centered gray system text, time above revoke
+      if (geom.time) {
+        drawTime(ctx, geom.time.text, geom.time.x, geom.time.y);
+      }
+      if (geom.revoke) {
+        drawTime(ctx, geom.revoke.text, geom.revoke.x, geom.revoke.y);
+      }
+
+      // Skip bubble+avatar when revoked
+      if (!geom.revoke) {
+        // Avatar
+        if (geom.avatar && msg.avatar) {
+          const avatarImg = imageMap.get(msg.avatar);
+          if (avatarImg) {
+            drawAvatar(ctx, avatarImg, geom.avatar.x, geom.avatar.y);
+          }
+        }
+
+        // Nickname
+        if (geom.nickname) {
+          drawNickname(ctx, msg.username, geom.nickname.x, geom.nickname.y, geom.nickname.align);
+        }
+
+        // Bubble
+        if (geom.bubble) {
+          drawBubble(
+            ctx,
+            geom.bubble.x,
+            geom.bubble.y,
+            geom.bubble.width,
+            geom.bubble.height,
+            msg.bubbleType
+          );
+
+          // Message text
+          drawMessageText(ctx, geom.textLayout.lines, geom.textOffsetX, geom.textOffsetY);
         }
       }
-
-      // Nickname
-      if (geom.nickname) {
-        drawNickname(ctx, msg.username, geom.nickname.x, geom.nickname.y, geom.nickname.align);
-      }
-
-      // Bubble
-      drawBubble(
-        ctx,
-        geom.bubble.x,
-        geom.bubble.y,
-        geom.bubble.width,
-        geom.bubble.height,
-        msg.bubbleType
-      );
-
-      // Message text
-      drawMessageText(ctx, geom.textLayout.lines, geom.textOffsetX, geom.textOffsetY);
     }
   } catch (drawError) {
     console.error('Canvas rendering failed:', drawError);

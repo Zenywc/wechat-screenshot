@@ -8,8 +8,11 @@ function createDefaultMessage(bubbleType: BubbleType = 'received'): Message {
     id: crypto.randomUUID(),
     avatar: null,
     username: '',
+    time: '',
     text: '',
     bubbleType,
+    revokeId: '你',
+    showRevoke: false,
   };
 }
 
@@ -84,8 +87,11 @@ const initialState: AppState = {
       id: crypto.randomUUID(),
       avatar: null,
       username: '',
+      time: '',
       text: '',
       bubbleType: 'received',
+      revokeId: '你',
+      showRevoke: false,
     },
   ],
 };

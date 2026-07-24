@@ -12,7 +12,7 @@ interface MessageCardProps {
 
 export function MessageCard({ message, index, total }: MessageCardProps) {
   const { dispatch } = useAppContext();
-  const { id, avatar, username, text, bubbleType } = message;
+  const { id, avatar, username, time, text, bubbleType, revokeId, showRevoke } = message;
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -46,6 +46,48 @@ export function MessageCard({ message, index, total }: MessageCardProps) {
           </div>
 
           <span className="text-xs text-gray-400 font-mono">#{index + 1}</span>
+
+          {/* Time input */}
+          <input
+            type="text"
+            value={time}
+            onChange={(e) =>
+              dispatch({ type: 'UPDATE_MESSAGE', payload: { id, updates: { time: e.target.value } } })
+            }
+            placeholder="如 星期四 14:30（半角:）"
+            className="
+              w-28 px-2 py-0.5 text-xs border border-gray-200 rounded-md
+              focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400
+              placeholder-gray-300 bg-gray-50
+            "
+          />
+
+          {/* Revoke section */}
+          <input
+            type="text"
+            value={revokeId}
+            onChange={(e) =>
+              dispatch({ type: 'UPDATE_MESSAGE', payload: { id, updates: { revokeId: e.target.value } } })
+            }
+            placeholder="撤回人ID"
+            className="
+              w-20 px-2 py-0.5 text-xs border border-gray-200 rounded-md
+              focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400
+              placeholder-gray-300 bg-gray-50
+            "
+          />
+          <label className="flex items-center gap-1 text-xs text-gray-500 cursor-pointer select-none whitespace-nowrap">
+            <input
+              type="checkbox"
+              checked={showRevoke}
+              onChange={(e) =>
+                dispatch({ type: 'UPDATE_MESSAGE', payload: { id, updates: { showRevoke: e.target.checked } } })
+              }
+              disabled={!revokeId}
+              className="w-3.5 h-3.5 rounded border-gray-300 text-blue-500 focus:ring-blue-300 disabled:opacity-30"
+            />
+            撤回
+          </label>
         </div>
 
         <div className="flex items-center gap-2">

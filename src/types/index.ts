@@ -6,8 +6,11 @@ export interface Message {
   id: string;
   avatar: string | null;   // base64 data URL, or null if no avatar
   username: string;        // display name, empty string = anonymous mode
+  time: string;            // optional time label, empty = not shown (e.g. "星期四 14:30")
   text: string;            // message body
   bubbleType: BubbleType;  // 'received' = white left, 'sent' = green right
+  revokeId: string;        // ID of the person who revoked, default "你"
+  showRevoke: boolean;     // checkbox: show "{revokeId}撤回了一条消息"
 }
 
 /** The global application state */

@@ -1,13 +1,7 @@
 import type { Message } from '../types';
-import type { MessageGeometry, TextLayoutResult } from './types';
+import type { MessageGeometry, TextLayoutResult, TimeGeometry, RevokeGeometry } from './types';
 import type { WeChatConstants } from '../constants/wechat';
 
-/**
- * Calculate positioning for every message in the conversation.
- * Pure function — no side effects.
- *
- * Returns geometries, total canvas height, and the minimal content width.
- */
 export function calculateGeometry(
   messages: Message[],
   textLayouts: Map<string, TextLayoutResult>,
@@ -28,13 +22,17 @@ export function calculateGeometry(
     TOP_PADDING,
     BOTTOM_PADDING,
     NICKNAME_FONT_SIZE,
+    SYSTEM_FONT_SIZE,
+    SYSTEM_ROW_GAP,
   } = constants;
+
+  const maxBubbleWidth = CANVAS_WIDTH * BUBBLE_MAX_WIDTH_RATIO;
 
   const geometries: MessageGeometry[] = [];
   let currentY = TOP_PADDING;
   let contentRight = 0;
-
-  const maxBubbleWidth = CANVAS_WIDTH * BUBBLE_MAX_WIDTH_RATIO;
+  let hasAnyTime = false;
+  let hasAnyRevoke = false;
 
   for (const msg of messages) {
     const layout = textLayouts.get(msg.id);
@@ -42,87 +40,89 @@ export function calculateGeometry(
 
     const hasAvatar = msg.avatar !== null;
     const hasName = msg.username.length > 0;
+    const hasTime = msg.time.length > 0;
+    const isRevoked = msg.showRevoke && msg.revokeId.length > 0;
     const showPersona = hasAvatar || hasName;
     const isSent = msg.bubbleType === 'sent';
 
-    // ---- Bubble dimensions ----
-    const bubbleContentW = Math.min(layout.totalWidth, maxBubbleWidth);
-    const bubbleW = bubbleContentW + BUBBLE_PADDING_H * 2;
-    const bubbleH = layout.totalHeight + BUBBLE_PADDING_V * 2;
+    if (hasTime) hasAnyTime = true;
+    if (isRevoked) hasAnyRevoke = true;
 
-    // ---- Nickname position (above bubble) ----
+    // ---- Bubble dimensions (each message sized independently) ----
+    const bubbleContentW = isRevoked ? 0 : Math.min(layout.totalWidth, maxBubbleWidth);
+    const bubbleW = bubbleContentW + BUBBLE_PADDING_H * 2;
+    const bubbleH = isRevoked ? 0 : layout.totalHeight + BUBBLE_PADDING_V * 2;
+
+    // ---- Time / Revoke rows (time above revoke, both centered) ----
+    let timeGeom: TimeGeometry | null = null;
+    let revokeGeom: RevokeGeometry | null = null;
+
+    if (hasTime) {
+      timeGeom = { x: CANVAS_WIDTH / 2, y: currentY, text: msg.time };
+      currentY += SYSTEM_FONT_SIZE + SYSTEM_ROW_GAP;
+    }
+    if (isRevoked) {
+      const label = msg.revokeId || '你';
+      revokeGeom = { x: CANVAS_WIDTH / 2, y: currentY, text: `${label}撤回了一条消息` };
+      currentY += SYSTEM_FONT_SIZE + SYSTEM_ROW_GAP;
+    }
+
+    // ---- Nickname position ----
     const nicknameY = currentY;
     const nameRowHeight = hasName ? NICKNAME_FONT_SIZE + 4 : 0;
     const bubbleStartY = showPersona ? nicknameY + nameRowHeight : currentY;
 
-    // ---- Avatar + Bubble X positioning ----
+    // ---- Avatar + Bubble X ----
     let avatarGeom: MessageGeometry['avatar'] = null;
     let nicknameGeom: MessageGeometry['nickname'] = null;
-    let bubbleX: number;
-    let triangleDir: 'left' | 'right';
+    let bubbleX = 0;
+    let triangleDir: 'left' | 'right' = 'left';
 
-    if (showPersona) {
-      if (isSent) {
-        const avatarX = CANVAS_WIDTH - MARGIN_RIGHT - AVATAR_SIZE;
-        if (hasAvatar) {
-          avatarGeom = { x: avatarX, y: currentY };
+    if (!isRevoked) {
+      if (showPersona) {
+        if (isSent) {
+          const avatarX = CANVAS_WIDTH - MARGIN_RIGHT - AVATAR_SIZE;
+          if (hasAvatar) avatarGeom = { x: avatarX, y: currentY };
+          if (hasName) nicknameGeom = { x: avatarX - AVATAR_BUBBLE_GAP, y: nicknameY, align: 'right' };
+          bubbleX = avatarX - AVATAR_BUBBLE_GAP - bubbleW;
+          triangleDir = 'right';
+        } else {
+          const avatarX = MARGIN_LEFT;
+          if (hasAvatar) avatarGeom = { x: avatarX, y: currentY };
+          if (hasName) nicknameGeom = { x: avatarX + AVATAR_SIZE + AVATAR_BUBBLE_GAP, y: nicknameY, align: 'left' };
+          bubbleX = avatarX + AVATAR_SIZE + AVATAR_BUBBLE_GAP;
+          triangleDir = 'left';
         }
-        if (hasName) {
-          nicknameGeom = {
-            x: avatarX - AVATAR_BUBBLE_GAP,
-            y: nicknameY,
-            align: 'right',
-          };
-        }
-        bubbleX = avatarX - AVATAR_BUBBLE_GAP - bubbleW;
-        triangleDir = 'right';
       } else {
-        const avatarX = MARGIN_LEFT;
-        if (hasAvatar) {
-          avatarGeom = { x: avatarX, y: currentY };
+        if (isSent) {
+          bubbleX = CANVAS_WIDTH - MARGIN_RIGHT - bubbleW;
+          triangleDir = 'right';
+        } else {
+          bubbleX = MARGIN_LEFT;
+          triangleDir = 'left';
         }
-        if (hasName) {
-          nicknameGeom = {
-            x: avatarX + AVATAR_SIZE + AVATAR_BUBBLE_GAP,
-            y: nicknameY,
-            align: 'left',
-          };
-        }
-        bubbleX = avatarX + AVATAR_SIZE + AVATAR_BUBBLE_GAP;
-        triangleDir = 'left';
-      }
-    } else {
-      if (isSent) {
-        bubbleX = CANVAS_WIDTH - MARGIN_RIGHT - bubbleW;
-        triangleDir = 'right';
-      } else {
-        bubbleX = MARGIN_LEFT;
-        triangleDir = 'left';
       }
     }
 
-    // ---- Triangle tip position ----
-    const triangleTipX =
-      triangleDir === 'left'
-        ? bubbleX + TW
-        : bubbleX + bubbleW - TW;
+    // ---- Triangle tip ----
+    const triangleTipX = triangleDir === 'left' ? bubbleX + TW : bubbleX + bubbleW - TW;
     const triangleTipY = bubbleStartY + BUBBLE_TRIANGLE_OFFSET;
 
-    // ---- Text offset: center text within the bubble BODY (excludes triangle) ----
+    // ---- Text offset ----
     const bubbleBodyX = triangleDir === 'left' ? bubbleX + TW : bubbleX;
     const bubbleBodyW = bubbleW - TW;
-    const textOffsetX = bubbleBodyX + (bubbleBodyW - layout.totalWidth) / 2;
+    const textOffsetX = bubbleBodyX + (bubbleBodyW - bubbleContentW) / 2;
     const textOffsetY = bubbleStartY + BUBBLE_PADDING_V;
 
     // ---- Block height ----
     const personaHeight = hasAvatar ? AVATAR_SIZE : 0;
-    const bubbleColHeight = nameRowHeight + bubbleH;
-    const blockHeight = showPersona
-      ? Math.max(personaHeight, bubbleColHeight)
-      : bubbleH;
+    const bubbleColHeight = nameRowHeight + (isRevoked ? 0 : bubbleH);
+    const bodyHeight = showPersona ? Math.max(personaHeight, bubbleColHeight) : (isRevoked ? 0 : bubbleH);
+    const sysRowH = (hasTime || isRevoked) ? SYSTEM_FONT_SIZE + SYSTEM_ROW_GAP : 0;
+    const blockHeight = sysRowH + bodyHeight;
 
-    // Track the rightmost pixel of any content
-    const bubbleRight = bubbleX + bubbleW;
+    // Track rightmost edge
+    const bubbleRight = isRevoked ? 0 : bubbleX + bubbleW;
     const avatarRight = avatarGeom ? avatarGeom.x + AVATAR_SIZE : 0;
     contentRight = Math.max(contentRight, bubbleRight, avatarRight);
 
@@ -130,7 +130,8 @@ export function calculateGeometry(
       messageId: msg.id,
       avatar: avatarGeom,
       nickname: nicknameGeom,
-      bubble: {
+      time: timeGeom,
+      bubble: isRevoked ? null : {
         x: bubbleX,
         y: bubbleStartY,
         width: bubbleW,
@@ -142,19 +143,22 @@ export function calculateGeometry(
       textLayout: layout,
       textOffsetX,
       textOffsetY,
+      revoke: revokeGeom,
       blockHeight,
     });
 
-    currentY += blockHeight + MESSAGE_GAP;
+    // Revoke uses tight spacing like WeChat system messages
+    currentY += bodyHeight + (isRevoked ? SYSTEM_ROW_GAP : MESSAGE_GAP);
   }
 
-  const totalHeight =
-    geometries.length > 0
-      ? currentY - MESSAGE_GAP + BOTTOM_PADDING
-      : TOP_PADDING + BOTTOM_PADDING;
+  const totalHeight = geometries.length > 0
+    ? currentY - MESSAGE_GAP + BOTTOM_PADDING
+    : TOP_PADDING + BOTTOM_PADDING;
 
-  // Right margin equals left margin for symmetric crop
-  const contentWidth = contentRight + MARGIN_RIGHT;
+  // Full width when time or revoke present (centered text needs space)
+  const contentWidth = (hasAnyTime || hasAnyRevoke)
+    ? CANVAS_WIDTH
+    : contentRight + MARGIN_RIGHT;
 
   return { geometries, totalHeight, contentWidth };
 }

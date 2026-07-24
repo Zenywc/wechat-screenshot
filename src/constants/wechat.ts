@@ -27,6 +27,12 @@ export const WECHAT = {
   BUBBLE_WHITE: '#FFFFFF',
   BUBBLE_GREEN: '#95EC69',
 
+  // Time & Revoke (same visual style — centered gray system message)
+  SYSTEM_FONT_SIZE: 22,
+  SYSTEM_FONT: '22px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',
+  SYSTEM_COLOR: '#B0B0B0',
+  SYSTEM_ROW_GAP: 8,         // gap from system row to next element
+
   // Text
   MESSAGE_FONT_SIZE: 32,
   MESSAGE_FONT: '32px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',

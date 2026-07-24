@@ -27,13 +27,27 @@ export interface BubbleGeometry {
   triangleTipY: number;
 }
 
+export interface TimeGeometry {
+  x: number;
+  y: number;
+  text: string;
+}
+
+export interface RevokeGeometry {
+  x: number;
+  y: number;
+  text: string;  // "xx撤回了一条消息"
+}
+
 export interface MessageGeometry {
   messageId: string;
   avatar: AvatarGeometry | null;
   nickname: { x: number; y: number; align: 'left' | 'right' } | null;
-  bubble: BubbleGeometry;
-  textLayout: TextLayoutResult;
+  time: TimeGeometry | null;
+  bubble: BubbleGeometry | null;           // null when revoked
+  textLayout: TextLayoutResult;            // empty when revoked
   textOffsetX: number;
   textOffsetY: number;
+  revoke: RevokeGeometry | null;           // set when revoked && !hasTime
   blockHeight: number;
 }
