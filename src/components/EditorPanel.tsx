@@ -14,10 +14,16 @@ export function EditorPanel() {
   };
 
   return (
-    <aside className="w-2/5 overflow-y-auto bg-gray-50 border-r border-gray-200">
-      <div className="p-4 space-y-4">
+    <aside className="
+      w-full lg:w-2/5 shrink-0
+      overflow-y-auto bg-gray-50
+      border-b-2 border-gray-200
+      lg:border-b-0 lg:border-r lg:border-gray-200
+      max-h-[45vh] lg:max-h-none
+    ">
+      <div className="p-3 lg:p-4 space-y-3 lg:space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-600 uppercase tracking-wider">
+          <h2 className="text-xs lg:text-sm font-semibold text-gray-600 uppercase tracking-wider">
             消息列表 ({messages.length})
           </h2>
           <button

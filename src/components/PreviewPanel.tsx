@@ -8,7 +8,12 @@ export function PreviewPanel() {
   const hasContent = state.messages.some((m) => m.text.length > 0);
 
   return (
-    <main className="w-3/5 flex flex-col items-center gap-4 p-6 overflow-y-auto bg-[#e0e0e0]">
+    <main className="
+      w-full lg:w-3/5
+      flex flex-col items-center gap-3 lg:gap-4
+      p-3 lg:p-6
+      overflow-y-auto bg-[#e0e0e0]
+    ">
       <ExportToolbar canvasRef={sharedCanvasRef} hasMessages={hasContent} />
       <CanvasPreview />
     </main>

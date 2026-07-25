@@ -17,7 +17,7 @@ export function CanvasPreview() {
   const hasText = state.messages.some((m) => m.text.length > 0);
 
   return (
-    <div ref={containerRef} className="relative flex flex-col items-center w-full max-w-[420px]">
+    <div ref={containerRef} className="relative flex flex-col items-center w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[420px]">
       {/* Phone frame */}
       <div className="
         bg-white rounded-3xl shadow-2xl overflow-hidden
