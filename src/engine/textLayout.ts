@@ -1,9 +1,8 @@
 import type { TextLayoutResult, TextLine } from './types';
 
 /**
- * Chinese-aware text layout with automatic line breaking.
- * Measures whole candidate substrings each step to preserve
- * kerning/ligature accuracy (sum of parts ≠ whole in HarfBuzz).
+ * Text layout with explicit \n line breaks and automatic overflow wrapping.
+ * Measures whole candidate substrings to preserve kerning/ligature accuracy.
  */
 export function layoutText(
   ctx: CanvasRenderingContext2D,
@@ -19,11 +18,17 @@ export function layoutText(
   let currentLine = '';
 
   for (const ch of chars) {
+    // Explicit newline: preserve user-entered line breaks
+    if (ch === '\n') {
+      lines.push({ text: currentLine, width: ctx.measureText(currentLine).width });
+      currentLine = '';
+      continue;
+    }
+
     const candidate = currentLine + ch;
     const measured = ctx.measureText(candidate).width;
 
     if (measured > maxWidth && currentLine.length > 0) {
-      // Break before this character
       lines.push({ text: currentLine, width: ctx.measureText(currentLine).width });
       currentLine = ch;
     } else {
@@ -31,8 +36,7 @@ export function layoutText(
     }
   }
 
-  // Push the last line
-  if (currentLine.length > 0) {
+  if (currentLine.length > 0 || lines.length === 0) {
     lines.push({ text: currentLine, width: ctx.measureText(currentLine).width });
   }
 
