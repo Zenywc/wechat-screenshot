@@ -82,14 +82,16 @@ export function calculateGeometry(
       if (showPersona) {
         if (isSent) {
           const avatarX = CANVAS_WIDTH - MARGIN_RIGHT - AVATAR_SIZE;
+          const bodyEdge = avatarX - AVATAR_BUBBLE_GAP - TW;
           if (hasAvatar) avatarGeom = { x: avatarX, y: currentY };
-          if (hasName) nicknameGeom = { x: avatarX - AVATAR_BUBBLE_GAP, y: nicknameY, align: 'right' };
+          if (hasName) nicknameGeom = { x: bodyEdge, y: nicknameY, align: 'right' };
           bubbleX = avatarX - AVATAR_BUBBLE_GAP - bubbleW;
           triangleDir = 'right';
         } else {
           const avatarX = MARGIN_LEFT;
+          const bodyEdge = avatarX + AVATAR_SIZE + AVATAR_BUBBLE_GAP + TW;
           if (hasAvatar) avatarGeom = { x: avatarX, y: currentY };
-          if (hasName) nicknameGeom = { x: avatarX + AVATAR_SIZE + AVATAR_BUBBLE_GAP, y: nicknameY, align: 'left' };
+          if (hasName) nicknameGeom = { x: bodyEdge, y: nicknameY, align: 'left' };
           bubbleX = avatarX + AVATAR_SIZE + AVATAR_BUBBLE_GAP;
           triangleDir = 'left';
         }
