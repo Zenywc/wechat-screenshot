@@ -8,6 +8,7 @@ import { drawBubble } from './drawBubble';
 import { drawNickname } from './drawNickname';
 import { drawMessageText } from './drawMessageText';
 import { drawTime } from './drawTime';
+import { drawQuote } from './drawQuote';
 import type { TextLayoutResult } from './types';
 
 /**
@@ -114,6 +115,11 @@ export async function renderToCanvas(
 
           // Message text
           drawMessageText(ctx, geom.textLayout.lines, geom.textOffsetX, geom.textOffsetY);
+        }
+
+        // Quote (below bubble)
+        if (geom.quote) {
+          drawQuote(ctx, geom.quote.text, geom.quote.x, geom.quote.y);
         }
       }
     }

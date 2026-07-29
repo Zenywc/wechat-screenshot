@@ -1,5 +1,5 @@
 import type { Message } from '../types';
-import type { MessageGeometry, TextLayoutResult, TimeGeometry, RevokeGeometry } from './types';
+import type { MessageGeometry, TextLayoutResult, TimeGeometry, RevokeGeometry, QuoteGeometry } from './types';
 import type { WeChatConstants } from '../constants/wechat';
 
 export function calculateGeometry(
@@ -24,6 +24,9 @@ export function calculateGeometry(
     NICKNAME_FONT_SIZE,
     SYSTEM_FONT_SIZE,
     SYSTEM_ROW_GAP,
+    QUOTE_FONT_SIZE,
+    QUOTE_BAR_WIDTH,
+    QUOTE_BAR_GAP,
   } = constants;
 
   const maxBubbleWidth = CANVAS_WIDTH * BUBBLE_MAX_WIDTH_RATIO;
@@ -116,12 +119,27 @@ export function calculateGeometry(
     const textOffsetX = bubbleBodyX + (bubbleBodyW - bubbleContentW) / 2;
     const textOffsetY = bubbleStartY + BUBBLE_PADDING_V;
 
+    // ---- Quote row (below bubble) ----
+    let quoteGeom: QuoteGeometry | null = null;
+    const hasQuote = !isRevoked && msg.quote.length > 0;
+    const quoteRowH = hasQuote ? QUOTE_FONT_SIZE * 1.4 + 4 : 0;
+    if (hasQuote) {
+      quoteGeom = {
+        x: bubbleBodyX,
+        y: bubbleStartY + bubbleH + 4,
+        text: msg.quote,
+      };
+      // Track quote right edge
+      const quoteW = QUOTE_BAR_WIDTH + QUOTE_BAR_GAP + layout.totalWidth; // approximate
+      contentRight = Math.max(contentRight, bubbleBodyX + quoteW);
+    }
+
     // ---- Block height ----
     const personaHeight = hasAvatar ? AVATAR_SIZE : 0;
     const bubbleColHeight = nameRowHeight + (isRevoked ? 0 : bubbleH);
     const bodyHeight = showPersona ? Math.max(personaHeight, bubbleColHeight) : (isRevoked ? 0 : bubbleH);
     const sysRowH = (hasTime || isRevoked) ? SYSTEM_FONT_SIZE + SYSTEM_ROW_GAP : 0;
-    const blockHeight = sysRowH + bodyHeight;
+    const blockHeight = sysRowH + bodyHeight + quoteRowH;
 
     // Track rightmost edge
     const bubbleRight = isRevoked ? 0 : bubbleX + bubbleW;
@@ -146,6 +164,7 @@ export function calculateGeometry(
       textOffsetX,
       textOffsetY,
       revoke: revokeGeom,
+      quote: quoteGeom,
       blockHeight,
     });
 

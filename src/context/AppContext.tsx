@@ -13,6 +13,7 @@ function createDefaultMessage(bubbleType: BubbleType = 'received'): Message {
     bubbleType,
     revokeId: '你',
     showRevoke: false,
+    quote: '',
   };
 }
 
@@ -92,6 +93,7 @@ const initialState: AppState = {
       bubbleType: 'received',
       revokeId: '你',
       showRevoke: false,
+      quote: '',
     },
   ],
 };

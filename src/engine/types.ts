@@ -39,6 +39,12 @@ export interface RevokeGeometry {
   text: string;  // "xx撤回了一条消息"
 }
 
+export interface QuoteGeometry {
+  x: number;     // bar left edge
+  y: number;
+  text: string;
+}
+
 export interface MessageGeometry {
   messageId: string;
   avatar: AvatarGeometry | null;
@@ -49,5 +55,6 @@ export interface MessageGeometry {
   textOffsetX: number;
   textOffsetY: number;
   revoke: RevokeGeometry | null;           // set when revoked && !hasTime
+  quote: QuoteGeometry | null;             // set when quote text present
   blockHeight: number;
 }

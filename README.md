@@ -1,32 +1,37 @@
-# React + TypeScript + Vite
+# WeChat 聊天截图生成器
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+程序化生成微信风格聊天截图，文字 100% 精准，无需 AI 生成。
 
-Currently, two official plugins are available:
+## 功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 头像上传 + 用户 ID
+- 多条消息对话流
+- 接收/发送两种气泡颜色
+- 时间标签、撤回消息、引用回复
+- 实时 Canvas 预览
+- 导出 PNG / 复制到剪贴板
+- 响应式布局（手机/平板/桌面）
 
-## React Compiler
+## 技术栈
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+React + TypeScript + Tailwind CSS + Canvas API + Vite
 
-## Expanding the Oxlint configuration
+## 使用
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev        # 开发
+npm run build      # 构建
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+打开 `dist/index.html` 或访问开发服务器即可使用。
+
+## 免责声明
+
+**中文：**
+
+本工具仅限用于合法的内容创作、教学或设计演示场景。**严禁**将本工具用于伪造聊天记录进行诈骗、诽谤、造谣或任何违法违规用途。使用者须自行承担因不当使用产生的全部法律责任，项目作者及贡献者不为此承担任何连带责任。
+
+**English:**
+
+This tool is intended **solely** for legitimate content creation, educational, or design demonstration purposes. **Do NOT** use this tool to fabricate chat records for fraud, defamation, spreading misinformation, or any illegal or unethical activities. Users are solely responsible for all legal liabilities arising from misuse. The project author and contributors accept no liability whatsoever.

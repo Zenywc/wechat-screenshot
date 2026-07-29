@@ -11,6 +11,7 @@ export interface Message {
   bubbleType: BubbleType;  // 'received' = white left, 'sent' = green right
   revokeId: string;        // ID of the person who revoked, default "你"
   showRevoke: boolean;     // checkbox: show "{revokeId}撤回了一条消息"
+  quote: string;           // quoted reply text, shown below bubble
 }
 
 /** The global application state */

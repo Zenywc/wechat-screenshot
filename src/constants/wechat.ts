@@ -33,6 +33,13 @@ export const WECHAT = {
   SYSTEM_COLOR: '#B0B0B0',
   SYSTEM_ROW_GAP: 8,         // gap from system row to next element
 
+  // Quote (below bubble)
+  QUOTE_FONT_SIZE: 16,
+  QUOTE_FONT: '16px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',
+  QUOTE_COLOR: '#B0B0B0',
+  QUOTE_BAR_WIDTH: 2,
+  QUOTE_BAR_GAP: 6,          // gap between bar and text
+
   // Text
   MESSAGE_FONT_SIZE: 32,
   MESSAGE_FONT: '32px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',

@@ -12,7 +12,7 @@ interface MessageCardProps {
 
 export function MessageCard({ message, index, total }: MessageCardProps) {
   const { dispatch } = useAppContext();
-  const { id, avatar, username, time, text, bubbleType, revokeId, showRevoke } = message;
+  const { id, avatar, username, time, text, bubbleType, revokeId, showRevoke, quote } = message;
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-3 lg:p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -146,6 +146,23 @@ export function MessageCard({ message, index, total }: MessageCardProps) {
             }
           />
         </div>
+      </div>
+
+      {/* Quote input */}
+      <div className="mt-2">
+        <input
+          type="text"
+          value={quote}
+          onChange={(e) =>
+            dispatch({ type: 'UPDATE_MESSAGE', payload: { id, updates: { quote: e.target.value } } })
+          }
+          placeholder="引用内容（选填）"
+          className="
+            w-full px-2 py-1 text-xs border border-gray-200 rounded-md
+            focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400
+            placeholder-gray-300 bg-gray-50
+          "
+        />
       </div>
 
       {/* Duplicate button */}
