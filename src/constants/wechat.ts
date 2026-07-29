@@ -40,8 +40,8 @@ export const WECHAT = {
   LINE_HEIGHT_RATIO: 1.5,
 
   // Layout margins (in canvas pixels)
-  MARGIN_LEFT: 40,
-  MARGIN_RIGHT: 40,
+  MARGIN_LEFT: 20,
+  MARGIN_RIGHT: 20,
   AVATAR_BUBBLE_GAP: 16,
   MESSAGE_GAP: 28,
   TOP_PADDING: 30,
